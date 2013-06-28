@@ -72,7 +72,7 @@ class Curve(InstrumentBase):
         * *<coefficient>* The curves temperature coefficient. Valid entries are
           `'negative'` and `'positive'`.
 
-    The Curve is implementing the `collections.sequence` protocoll. It models a
+    The Curve is implementing the `collections.sequence` protocol. It models a
     sequence of points. These are tuples with the following structure
     *(<units value>, <temp value>)*, where
 
@@ -189,7 +189,7 @@ class Heater(InstrumentBase):
     ERROR_STATUS = [
         'no error',
         'power supply over voltage',
-        'power supply under voltat',
+        'power supply under voltage',
         'output digital-to-analog converter error',
         'current limit digital-to-analog converter error',
         'open heater load',

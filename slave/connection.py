@@ -39,7 +39,7 @@ import ctypes as ct
 import ctypes.util
 import os
 import socket
-
+import time
 
 class _LockDict(collections.defaultdict):
     def __init__(self):
@@ -121,9 +121,68 @@ class SimulatedConnection(object):
     def write(self, value):
         pass
 
+class AsciiSerial(Connection):
+    """A serial interface using pySerial
+
+    A serial interface based on the pySerial library. It assumes a text-based communication
+    with an ASCII encoding and will retry sending a command if the response is incorrect. 
+    Code is based on the EnchancedSerial example in pySerial documentation.
+    """
+    
+    def __init__(self, port, term_chars='\r\n', delay=0.1, timeout=1., **kwargs):
+        """
+        :param args: Directly passed to the Serial class.
+        :param term_chars: sets the delimiter between lines and defaults to `\\r\\n`
+        :param delay: sets the delay in seconds between sent commands
+        :param timeout: maximum time to wait for commands
+        :param kwargs: Directly passed through to the Serial class        
+        """
+        try:
+            import serial
+        except ImportError:
+            raise ImportError('please install pySerial')
+        
+        try:
+            self._serial = serial.Serial(port, timeout=delay, **kwargs)
+            super(AsciiSerial, self).__init__(lock=_resource_locks['Serial{}'.format(port)])
+        except IOError as e:
+            log.error(e)
+            
+        self._term_chars = term_chars
+        self.delay = delay
+        self.timeout = timeout
+        self.buf = ''
+
+    def _readline(self):
+        """
+        :param timeout: the maximum time in seconds to wait for a complete line
+        """
+        tries = 0
+        while True:
+            self.buf += self._serial.read(512)
+            pos = self.buf.find(self._term_chars)
+            log.debug('pos: {}'.format(pos))
+            if pos >= 0:
+                line, self.buf = self.buf[:pos+2], self.buf[pos+2:]
+                return line
+            log.debug('finished try {}'.format(tries)) 
+            tries += 1
+            if tries * self.delay > self.timeout:
+                break
+        line, self.buf = self.buf, ''
+        return line
+
+    def __write__(self, value):
+        self._serial.write('{:s}'.format(value) + self._term_chars)
+
+    def __read__(self):
+        return self._readline()
+
+    def __delay__(self):
+        time.sleep(self.delay)
 
 class GpibDevice(Connection):
-    """Wrapps a linux-gpib device.
+    """Wraps a linux-gpib device.
 
     :param primary: The primary gpib address in the range of 0 to 30.
     :param secondary: The secondary gpib address.

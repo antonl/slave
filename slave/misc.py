@@ -49,7 +49,7 @@ class LockedConnection(object):
     :param connection: The wrapped connection object.
     :param lock: Can be used to inject a custom thread lock, default: `None`.
 
-    The LockedConnection wrapps a normal connection object and forwards the
+    The LockedConnection wraps a normal connection object and forwards the
     calls to :meth:`.ask` and :meth:`.write` member functions to the connection
     object. A thread lock is acquired before, and released after the call to
     the internal connection object.
