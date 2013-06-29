@@ -21,11 +21,11 @@ class SMC100(InstrumentBase):
                      'program header prefix': self.idx})
 
         self.offset = Command(write=('PR', Float), 
-                cfg={'program header prefix': self.idx}))
+                cfg={'program header prefix': self.idx})
 
         self.position = Command(('TP', Float), ('PA', Float(min=0)), 
                 cfg={'response header separator': 'TP',
-                     'program header prefix': self.idx}))
+                     'program header prefix': self.idx})
 
         self.set_point = Command('PH', Float,
                 cfg={'response header separator': 'PH',
