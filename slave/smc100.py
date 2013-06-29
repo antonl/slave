@@ -2,7 +2,7 @@ from slave.core import Command, InstrumentBase
 from slave.types import String, Enum, Integer, Float, Register
 
 class SMC100(InstrumentBase):
-    def __init__(connection, idx=1):
+    def __init__(self, connection, idx=1):
         """
         :param connection: RS-232-C connection to the controller
         :param name: index of the controller on the internal RS-485 link 
