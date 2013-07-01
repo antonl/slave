@@ -40,6 +40,9 @@ import ctypes.util
 import os
 import socket
 import time
+import logging
+
+log = logging.getLogger(__name__ + '.connection')
 
 class _LockDict(collections.defaultdict):
     def __init__(self):
@@ -53,7 +56,6 @@ class _LockDict(collections.defaultdict):
 
 #: A dictionairy of resource locks.
 _resource_locks = _LockDict()
-
 
 class Connection(object):
     """An abstract base class defining the connection interface.
