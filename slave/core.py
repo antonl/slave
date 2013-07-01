@@ -237,7 +237,7 @@ class Command(object):
         parsed_data = []
         for v, t in it.izip_longest(response.split(rds), resp_t):
             parsed_data.append(t.load(v) if t else v)
-        return header, tuple(parsed_data)
+        return header, parsed_data
 
     def _simulate(self):
         response = self._simulated_resp

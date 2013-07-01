@@ -94,3 +94,7 @@ class NullHandler(logging.Handler):
     """A fallback code for python < 2.7"""
     def emit(self, record):
         pass
+
+def invert_dict(d):
+    '''returns an inverted dictionary provided that values are unique'''
+    return dict([(v, k) for k, v in d.iteritems()])
