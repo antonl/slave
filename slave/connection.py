@@ -42,7 +42,7 @@ import socket
 import time
 import logging
 
-log = logging.getLogger(__name__ + '.connection')
+log = logging.getLogger(__name__)
 
 class _LockDict(collections.defaultdict):
     def __init__(self):

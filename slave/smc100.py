@@ -9,27 +9,36 @@ class SMC100(InstrumentBase):
         """
         super(SMC100, self).__init__(connection)
         self.idx = idx
+        cfg = {'program header prefix': str(self.idx), 
+               'program header separator': '',
+               'response header prefix': str(self.idx)}
+
+        def merge_cfg(d):
+            tmp = d.copy()
+            tmp.update(cfg)
+            return tmp
 
         self.errorcode = Command(('TE', String), 
-                cfg={'response header separator': 'TE',
-                     'program header prefix': self.idx})
+                cfg=merge_cfg({'response header': 'TE'}))
+        self.error_string = Command(('TB', String), 
+                cfg=merge_cfg({'response header': 'TB','response data separator': ''}))
+
+        self.controller_version = Command(('VE', String), 
+                cfg=merge_cfg({'response header': 'VE', 'response data separator': ''})) 
+
         self.enabled = Command(('MM', Boolean), ('MM', Boolean),
-                cfg={'response header separator': 'MM', 'program header prefix': self.idx})
+                cfg=merge_cfg({'response header': 'MM'}))
 
         self.state = Command(('TS', String), # should be register, but in hex
-                cfg={'response header separator': 'TS',
-                     'program header prefix': str(self.idx)})
+                cfg=merge_cfg({'response header': 'TS'}))
 
-        self.offset = Command(write=('PR', Float), 
-                cfg={'program header prefix': str(self.idx)})
+        self.offset = Command(write=('PR', Float), cfg=cfg)
 
         self.position = Command(('TP', Float), ('PA', Float(min=0)), 
-                cfg={'response header separator': 'TP',
-                     'program header prefix': str(self.idx)})
+                cfg=merge_cfg({'response header': 'TP'}))
 
-        self.set_point = Command(('PH', Float),
-                cfg={'response header separator': 'PH',
-                     'program header prefix': str(self.idx)})
+        #self.set_point = Command(('PH', Float), # Due to firmware bug, returns something weird
+        #        cfg=merge_cfg({'response header': 'PH'}))
 
     def stop(self): self.connection.write('{0}ST'.format(self.idx))
     def enter_configure(self): self.connection.write('{0}PW1'.format(self.idx))

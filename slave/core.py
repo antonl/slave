@@ -111,7 +111,8 @@ class Command(object):
         'program header prefix': '',
         'program header separator': ' ',
         'program data separator': ',',
-        'response header separator': None,
+        'response header prefix': '',
+        'response header': '',
         'response data separator': ',',
     }
 
@@ -217,14 +218,19 @@ class Command(object):
 
     def _parse_response(self, response):
         """Parses the response."""
-        rhs = self.cfg['response header separator']
+        rhp = self.cfg['response header prefix']
+        rh = self.cfg['response header']
         rds = self.cfg['response data separator']
         resp_t = self._query.response_type
 
-        if rhs:
-            # Strip of response header.
-            # XXX What if we wan't to split on any whitespace?
-            header, response = response.split(rhs, 1)
+        if rh != '' or rhp != '': 
+            # either the response header prefix or response header is defined
+            prefix, header, response = response[:len(rhp)], response[len(rhp):len(rhp)+len(rh)], \
+                response[len(rhp)+len(rh):]
+            _logger.info('parse response: pre "{0}" header "{1}" response "{2}"'.format(prefix, header, response))
+
+            assert prefix == rhp
+            assert header == rh
         else:
             header = None
 
@@ -242,7 +248,7 @@ class Command(object):
                 self.cfg['response data separator']
             )
             # This simulates a response without a response header.
-            assert(self.cfg['response header separator'] is None)
+            assert(self.cfg['response header'] is None)
             # store response if writeable
             if self._write:
                 self._simulated_resp = response
