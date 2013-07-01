@@ -18,22 +18,22 @@ class SMC100(InstrumentBase):
 
         self.state = Command(('TS', String), # should be register, but in hex
                 cfg={'response header separator': 'TS',
-                     'program header prefix': self.idx})
+                     'program header prefix': str(self.idx)})
 
         self.offset = Command(write=('PR', Float), 
-                cfg={'program header prefix': self.idx})
+                cfg={'program header prefix': str(self.idx)})
 
         self.position = Command(('TP', Float), ('PA', Float(min=0)), 
                 cfg={'response header separator': 'TP',
-                     'program header prefix': self.idx})
+                     'program header prefix': str(self.idx)})
 
         self.set_point = Command(('PH', Float),
                 cfg={'response header separator': 'PH',
-                     'program header prefix': self.idx})
+                     'program header prefix': str(self.idx)})
 
     def stop(self): self.connection.write('{0}ST'.format(self.idx))
     def enter_configure(self): self.connection.write('{0}PW1'.format(self.idx))
-    def load_esp(self, store=2): self.connection.write('{0}ZX{}'.format(self.idx, int(store)))
+    def load_esp(self, store=2): self.connection.write('{0}ZX{1}'.format(self.idx, int(store)))
     def reference(self): self.connection.write('{0}OR'.format(self.idx))
     def exit_configure(self): self.connection.write('{0}PW0'.format(self.idx))
     def reset(self): self.connection.write('{0}RS'.format(self.idx))
