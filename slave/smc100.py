@@ -1,5 +1,5 @@
 from slave.core import Command, InstrumentBase
-from slave.types import String, Enum, Integer, Float, Register
+from slave.types import String, Enum, Integer, Float, Register, Boolean
 
 class SMC100(InstrumentBase):
     def __init__(self, connection, idx=1):
@@ -16,7 +16,7 @@ class SMC100(InstrumentBase):
         self.enabled = Command(('MM', Boolean), ('MM', Boolean),
                 cfg={'response header separator': 'MM', 'program header prefix': self.idx})
 
-        self.state = Command(('TS', Register),
+        self.state = Command(('TS', String), # should be register, but in hex
                 cfg={'response header separator': 'TS',
                      'program header prefix': self.idx})
 
@@ -27,7 +27,7 @@ class SMC100(InstrumentBase):
                 cfg={'response header separator': 'TP',
                      'program header prefix': self.idx})
 
-        self.set_point = Command('PH', Float,
+        self.set_point = Command(('PH', Float),
                 cfg={'response header separator': 'PH',
                      'program header prefix': self.idx})
 
