@@ -74,14 +74,14 @@ class SMC100CC(InstrumentBase):
                'response data separator': ','}
 
         def merge_cfg(d):
-            tmp = d.copy()
-            tmp.update(cfg)
+            tmp = cfg.copy()
+            tmp.update(d)
             return tmp
 
         self.errorcode = Command(('TE', String), 
                 cfg=merge_cfg({'response header': 'TE'}))
         self.error_string = Command(('TB', String), 
-                cfg=merge_cfg({'response header': 'TB'}))
+                cfg=merge_cfg({'response header': 'TB', 'response data separator': '!!'}))
 
 
         self.state = Command(('TS', ErrorAndStateRegister),
@@ -146,7 +146,8 @@ class SMC100CC(InstrumentBase):
         self.home_search_timeout = Command(('OT?', Float), ('OT', Float(min=1, max=1e3)), 
                 cfg=merge_cfg({'response header': 'OT'}))
 
-        self.in_configure = Command(('PW?', Boolean), ('PW', Boolean), 
+        # Firmware bug means this command always returns True, use state instead
+        self.in_configure = Command(('PW?', Boolean), ('PW', Boolean),  
                 cfg=merge_cfg({'response header': 'PW'}))
 
         self.closed_loop = Command(('SC?', Boolean), ('SC', Boolean), 
@@ -155,8 +156,8 @@ class SMC100CC(InstrumentBase):
         self.velocity = Command(('VA?', Float), ('VA', Float(min=1e-6, max=1e12)), 
                 cfg=merge_cfg({'response header': 'VA'}))
 
-        self.base_velocity = Command(('VB?', Float), ('VB', Float(min=0)), 
-                cfg=merge_cfg({'response header': 'VB'}))
+        #self.base_velocity = Command(('VB?', Float), ('VB', Float(min=0)), 
+        #        cfg=merge_cfg({'response header': 'VB'}))
 
         self.controller_version = Command(('VE', String), 
                 cfg=merge_cfg({'response header': 'VE'})) 
