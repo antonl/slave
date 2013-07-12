@@ -156,9 +156,6 @@ class AsciiSerial(Connection):
         self.buf = ''
 
     def _readline(self):
-        """
-        :param timeout: the maximum time in seconds to wait for a complete line
-        """
         tries = 0
         while True:
             self.buf += self._serial.read(512)
@@ -166,7 +163,10 @@ class AsciiSerial(Connection):
             log.debug('pos: {}'.format(pos))
             if pos >= 0:
                 line, self.buf = self.buf[:pos+2], self.buf[pos+2:]
-                return line
+                try:
+                    line.decode('ascii')
+                except:
+                    pass
             log.debug('finished try {}'.format(tries)) 
             tries += 1
             if tries * self.delay > self.timeout:
